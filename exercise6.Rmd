@@ -1,0 +1,150 @@
+---
+title: "exercise6"
+author: "Mark Ira Siena"
+date: "2026-10-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+name <- c("Ana", "Ben", "Cid", "Dex", "Eli")
+age <- c(20, 21, 19, 22, 20)
+passed <- c(TRUE, TRUE, FALSE, TRUE, FALSE)
+```
+```{r}
+students <- data.frame(name = name, age = age, passed = passed)
+print(students)
+```
+```{r}
+print(typeof(students$name))
+print(class(students$name))
+```
+```{r}
+courses <- data.frame(
+  course_code = c("IS101", "IS102", "IS103"),
+  units = c(3, 3, 2),
+  instructor = c("Dr. P. Reyes", "Dr. R. Santos", "Dr. S. Cruz")
+)
+print(courses)
+```
+Question#1
+Both ways of building a data frame produce the same kind of object: a data frame, a table where each argument becomes a column. The only difference is where the vectors come from. For students, the vectors (name, age, passed) were created first and then passed in. For courses, the vectors were written directly inside data.frame(). Once the call finishes, the result is the same, and class() returns "data.frame" for both.
+Question#2
+A list in R is a container that holds several elements, and each element can be a different type and length. A data frame is built on this idea: it is a list in which every element is a vector (a column), with the extra rule that all the vectors must have the same length. That is why “a list of vectors of equal length” is a good description. You can even see this in the way $ works. students$name pulls out a list element by name, just as it does for a list.
+```{r}
+print(students$age)
+print(students[["age"]])
+print(students["age"])
+
+print(class(students$age))
+print(class(students[["age"]]))
+print(class(students["age"]))
+```
+```{r}
+print(students[2, ])
+```
+```{r}
+print(students[3, "name"])
+```
+```{r}
+print(students[students$passed == TRUE, ])
+```
+Question#3
+Students["age"] returns a data frame with one column, so it still has the table structure (row numbers and a column header). students$age returns a numeric vector, which is just the raw values with no table around them.
+Question#4
+The & operator compares the two vectors position by position and returns TRUE only where both are TRUE
+R then uses this combined vector inside students[ , ] to keep the rows marked TRUE (rows 1, 2, and 4) and drop the rest. Because & works element by element, each student is judged on their own age and their own pass status.
+If you used | (OR) instead, a row would be kept when at least one condition is TRUE
+Eli (row 5) is also included, because Eli’s age is 20, which is greater than 19, even though Eli did not pass. The result would have 4 rows (Ana, Ben, Dex, Eli) instead of 3. In general, & is stricter and gives the same number of rows or fewer, while | is looser and gives the same number or more.
+```{r}
+str(students)
+```
+```{r}
+print(dim(students))
+print(nrow(students))
+print(ncol(students))
+```
+```{r}
+print(names(students))
+print(colnames(students))
+```
+```{r}
+summary(students)
+```
+Question#5
+A mean wouldn’t make sense for name because averaging requires numbers that can be added and divided. Text like “Ana” and “Ben” has no numeric value, so there is nothing to add up. Likewise, a median or quartile would need the values to have a natural order and size, which names don’t have. If you try mean(students$name), R returns NA with a warning that the argument is not numeric or logical.
+Question#6
+str() shows the structure of the data frame: the number of rows and columns, each column’s name, its data type (chr, num, logi), and the first few values. summary() shows statistics about the values: the min, quartiles, median, and mean for numbers, counts for logical values, and only basic info for text.
+
+str() is more useful when you first load or build a data frame and need to check that it is what you expect: whether the columns have the right types (for example, a number accidentally stored as character), how many rows and columns there are, and what the values look like. It is also good for catching problems before you try to compute anything.
+
+summary() is more useful once you know the structure is correct and you want to understand the data itself: the typical age, the range, how many students passed, or whether there are any NA values. It describes what is inside the columns instead of how they are set up.
+
+In short, use str() to check what you have, and summary() to learn what the values tell you.
+```{r}
+students$year_level <- c(2, 3, 1, 4, 2)
+print(students)
+```
+```{r}
+students$passed <- NULL
+print(students)
+```
+```{r}
+print(students[order(students$age), ])
+```
+```{r}
+print(students[order(students$age, decreasing = TRUE), ])
+```
+Question#7
+When you drop or modify columns/rows in a data frame, subsequent operations that rely on those specific column names will fail if the columns no longer exist. Keeping track of the data frame's current structure ensures that your code references valid variables, prevents runtime errors, and maintains logical consistency throughout your analysis workflow.
+Question#8
+Step 1
+order(students$age) evaluates the age column and returns a numeric vector of row indices (positions) sorted in ascending order of age 
+Step 2
+The bracket notation [ , ] in R takes [row_indices, column_indices]. By placing the position vector in the row position and leaving the column position blank, you tell R to rearrange all the rows of the data frame according to that new sequence.
+Step 3
+Reordering all columns: Because no column filter is specified after the comma, R keeps all columns intact for every row, outputting the entire data frame with its rows reordered based on the sorted age positions.
+```{r}
+grades <- data.frame(
+  name = c("Ana", "Ben", "Cid", "Dex", "Eli"),
+  midterm = c(85, 78, 92, 88, 70),
+  final = c(90, 82, 95, 84, 75)
+)
+```
+```{r}
+grades$average <- (grades$midterm + grades$final) / 2
+```
+```{r}
+grades[grades$remarks == "Failed", c("name", "average")]
+```
+Question#9
+Step 1
+Create a difference/change column: Add a new column to calculate the difference between the midterm and final scores (e.g., grades$drop <- grades$midterm - grades$final) to track how much students dropped or improved.
+Step 2
+Subset or sort by remarks: Subset the data frame or sort the rows by the remarks column (or by average and drop) to group failing or struggling students together.
+Step 3
+Analyze and compare: Sort the data frame by the drop column in descending order (grades[order(grades$drop, decreasing = TRUE), ]) to see if students with failing remarks experienced the largest drops, or sort by the midterm column to see if they simply started with consistently low scores.
+CONCLUSION
+A data frame is a two-dimensional tabular data structure in R used to store datasets with rows and columns. It is built upon vectors, where each column acts as an individual vector that can hold a specific data type (such as numeric, character, or logical), and relates to lists because a data frame is essentially a list of vectors of equal length. This structure is R's primary tool for real-world tabular data because it allows columns of different data types to be neatly bound together while supporting powerful indexing, filtering, and sorting operations.
