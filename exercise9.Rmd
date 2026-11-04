@@ -1,0 +1,136 @@
+---
+title: "exercise9"
+author: "Mark Ira Siena"
+date: "2026-11-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Part A
+Question#1
+a
+```{r}
+shoes <- data.frame(
+  ShoeSize = c(6.5, 9.0, 8.5, 8.5, 10.5, 7.0, 9.5, 9.0, 13.0, 7.5, 10.5, 8.5, 12.0, 10.5,
+               13.0, 11.5, 8.5, 5.0, 10.0, 6.5, 7.5, 8.5, 10.5, 8.5, 10.5, 11.0, 9.0, 13.0),
+  Height   = c(66.0, 68.0, 64.5, 65.0, 70.0, 64.0, 70.0, 71.0, 72.0, 64.0, 74.5, 67.0, 71.0, 71.0,
+               77.0, 72.0, 59.0, 62.0, 72.0, 66.0, 64.0, 67.0, 73.0, 69.0, 72.0, 70.0, 69.0, 70.0),
+  Gender   = c("F","F","F","F","M","F","F","F","M","F","M","F","M","M",
+               "M","M","F","F","M","F","F","M","M","F","M","M","M","M")
+)
+
+write.csv(shoes, "shoesize.csv", row.names = FALSE)
+```
+b
+```{r}
+shoes <- read.csv("shoesize.csv")
+tail(shoes, 5)
+```
+c
+```{r}
+str(shoes)
+head(shoes)
+```
+The data frame has 3 variables: ShoeSize and Height are numeric, and Gender is character text
+d
+```{r}
+dim(shoes)
+nrow(shoes)
+ncol(shoes)
+```
+There are 28 rows and 3 columns
+e
+```{r}
+summary(shoes)
+```
+str() shows the structure: the object type, the number of rows and columns, each column’s data type, and the first few values. summary() shows statistics: min, quartiles, median, mean and max for numeric columns. For text columns it only gives length, class and mode.
+
+f
+```{r}
+females <- subset(shoes, Gender == "F")
+males   <- subset(shoes, Gender == "M")
+females
+males
+```
+14 females and 14 males
+
+g
+```{r}
+mean(shoes$ShoeSize)
+mean(shoes$Height)
+```
+
+h
+Yes, there is a positive relationship. Taller respondents tend to have larger shoe sizes. For example, the 77-inch respondent wears a 13, while the 59-inch respondent wears an 8.5 and the 62-inch respondent wears a 5. The correlation (Question #6a) is about 0.78, which is fairly strong. This shows association, not that one causes the other.
+
+Question#2
+```{r}
+shoes$Gender <- factor(shoes$Gender)
+str(shoes$Gender)
+levels(shoes$Gender)
+table(shoes$Gender)
+```
+
+Question#3
+
+R Markdown uses the .Rmd file’s own folder as the working directory, so a relative path like read.csv("shoesize.csv") always looks next to the document. If it used whatever folder the console happened to be in, the same file would find the data on your computer but fail on someone else’s, depending on where their session started. Because the folder is fixed to the document, anyone who gets the project folder can knit it without changing any paths. That makes the imports reliable and the results reproducible.
+
+Question#4
+```{r}
+str(shoes)
+```
+Before the factor conversion, Gender shows as chr (character). I expected this, since the file holds the letters “F” and “M” and read.csv() reads text as character by default. It is not yet a factor, which is why Question #2 converts it.
+If a numeric column like ShoeSize were imported as character (for example, because of a stray value like “N/A” or “9,5”), later analysis would go wrong in several ways:
+
+Question#5
+```{r}
+head(shoes)
+tail(shoes)
+```
+head() shows only the first rows, so problems at the end of the file are invisible. tail() shows the last rows
+
+Question#6
+
+a
+```{r}
+cor(shoes$ShoeSize, shoes$Height)
+```
+
+b
+```{r}
+shoes[shoes$ShoeSize >= 11, ]
+```
+Six rows meet the condition, and all of them are male
+
+Question#7
+```{r}
+mean(females$ShoeSize); mean(females$Height)
+mean(males$ShoeSize);   mean(males$Height)
+
+cor(females$ShoeSize, females$Height)
+cor(males$ShoeSize, males$Height)
+```
+Males have a higher mean shoe size (about 11.0 vs 7.9) and a higher mean height (about 71.5 vs 65.7) than females.
+Does the data support a relationship within each gender? Yes, the relationship holds inside each group. The correlations are positive in both (roughly 0.5), but weaker than the overall 0.78. Part of the strong overall correlation comes from gender itself: males are both taller and have larger feet, which stretches the combined data into a stronger trend. So gender is an important factor to account for separately. Studying the relationship within each gender, or including gender in the analysis, gives a more honest picture than pooling everyone together.
